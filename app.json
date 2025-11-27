@@ -1,16 +1,18 @@
 {
   "expo": {
-    "name": "CARB-APPLE-V3.0",
+    "name": "CARB",
     "slug": "carb-apple-v3",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
+    "description": "Green carbon tracking for truckers - sleek, simple, and smart.",
+    "primaryColor": "#9BC53D",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#9BC53D"
     },
     "ios": {
       "supportsTablet": true,
@@ -19,12 +21,21 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#9BC53D"
       },
       "package": "com.carbapple.v3"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "name": "CARB",
+      "shortName": "CARB",
+      "description": "Green carbon tracking for truckers",
+      "themeColor": "#9BC53D",
+      "backgroundColor": "#ffffff",
+      "meta": {
+        "apple-mobile-web-app-capable": "yes",
+        "apple-mobile-web-app-status-bar-style": "black-translucent"
+      }
     }
   }
 }

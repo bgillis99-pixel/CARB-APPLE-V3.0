@@ -1,0 +1,145 @@
+<svg width="800" height="512" viewBox="0 0 800 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Glossy green gradient -->
+    <radialGradient id="appleGradient" cx="35%" cy="30%">
+      <stop offset="0%" style="stop-color:#D4E89E;stop-opacity:1" />
+      <stop offset="25%" style="stop-color:#B8D96D;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#9BC53D;stop-opacity:1" />
+      <stop offset="75%" style="stop-color:#7A9B2E;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#5D7A1F;stop-opacity:1" />
+    </radialGradient>
+
+    <!-- Silver-green metallic shine -->
+    <linearGradient id="silverShine" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:0.9" />
+      <stop offset="30%" style="stop-color:#E8F5D0;stop-opacity:0.7" />
+      <stop offset="60%" style="stop-color:#9BC53D;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#7A9B2E;stop-opacity:0.1" />
+    </linearGradient>
+
+    <!-- Glossy overlay -->
+    <linearGradient id="glossOverlay" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:0.6" />
+      <stop offset="50%" style="stop-color:#FFFFFF;stop-opacity:0" />
+    </linearGradient>
+
+    <!-- Leaf gradient -->
+    <linearGradient id="leafGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8FBC3C;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#5D7A1F;stop-opacity:1" />
+    </linearGradient>
+
+    <!-- Worm/text gradient (brown earthy tones) -->
+    <linearGradient id="wormGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#D4A574;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#C4956B;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#A67C52;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Apple body with gradient -->
+  <path d="M 256 480 C 150 480 65 395 65 289 C 65 220 95 158 143 118 C 160 103 180 91 202 82 C 210 50 235 25 268 25 C 295 25 318 42 328 67 C 350 72 370 82 387 95 C 440 135 475 197 475 267 C 475 373 390 458 284 458 C 270 458 256 480 256 480 Z" fill="url(#appleGradient)"/>
+
+  <!-- C-shaped bite (large) -->
+  <path d="M 475 267 C 475 197 440 135 387 95 C 387 95 420 140 420 200 C 420 260 395 310 355 340 C 340 352 340 380 355 395 C 380 415 390 430 390 458 C 435 430 475 353 475 267 Z" fill="#FCFCFC"/>
+
+  <!-- Bottom shadow for depth -->
+  <ellipse cx="256" cy="460" rx="180" ry="30" fill="#5D7A1F" opacity="0.4"/>
+
+  <!-- Silver-green metallic shine on left -->
+  <ellipse cx="170" cy="180" rx="65" ry="140" fill="url(#silverShine)" transform="rotate(-30 170 180)"/>
+
+  <!-- Top glossy highlight -->
+  <path d="M 180 100 Q 220 95 260 105 Q 240 130 200 150 Q 165 130 180 100 Z" fill="url(#glossOverlay)"/>
+
+  <!-- Additional shine streak -->
+  <ellipse cx="200" cy="200" rx="25" ry="80" fill="white" opacity="0.5" transform="rotate(-25 200 200)"/>
+
+  <!-- Glossy reflection -->
+  <ellipse cx="155" cy="140" rx="35" ry="50" fill="white" opacity="0.7" transform="rotate(-35 155 140)"/>
+
+  <!-- Leaf -->
+  <path d="M 268 25 C 268 25 285 15 305 20 C 325 25 335 45 330 65 C 328 72 325 78 320 83 C 315 88 308 91 301 92 C 290 93 280 88 275 80 C 272 75 270 68 270 62 C 270 50 268 37 268 25 Z" fill="url(#leafGradient)"/>
+
+  <!-- Leaf highlight -->
+  <ellipse cx="295" cy="50" rx="12" ry="18" fill="white" opacity="0.4" transform="rotate(-20 295 50)"/>
+
+  <!-- Small teeth marks in bite -->
+  <ellipse cx="385" cy="280" rx="6" ry="10" fill="#E8E8E8" opacity="0.6"/>
+  <ellipse cx="395" cy="320" rx="6" ry="10" fill="#E8E8E8" opacity="0.6"/>
+  <ellipse cx="375" cy="355" rx="5" ry="8" fill="#E8E8E8" opacity="0.5"/>
+
+  <!-- Worm body coming out of bite -->
+  <g id="worm">
+    <!-- Worm body segments (curved path) -->
+    <path d="M 420 240 Q 460 235 490 245 Q 500 250 505 260"
+          stroke="url(#wormGradient)"
+          stroke-width="18"
+          stroke-linecap="round"
+          fill="none"
+          opacity="0.9"/>
+
+    <!-- Worm highlight -->
+    <path d="M 422 235 Q 462 230 492 240"
+          stroke="#F4E4D0"
+          stroke-width="6"
+          stroke-linecap="round"
+          fill="none"
+          opacity="0.6"/>
+
+    <!-- Worm eye (small dot) -->
+    <circle cx="508" cy="258" r="3" fill="#3D2817"/>
+  </g>
+
+  <!-- "arb" in cursive like a worm -->
+  <g id="arbText">
+    <!-- The letter flow -->
+    <path id="textPath" d="M 510 265 Q 530 270 550 265 Q 570 260 590 270 Q 610 280 625 270 Q 645 255 670 265 Q 690 275 710 270"
+          fill="none"/>
+
+    <!-- "arb" in flowing cursive style -->
+    <text font-family="'Brush Script MT', 'Lucida Handwriting', cursive"
+          font-size="85"
+          fill="url(#wormGradient)"
+          font-weight="normal"
+          font-style="italic">
+      <textPath href="#textPath" startOffset="0%">
+        arb
+      </textPath>
+    </text>
+
+    <!-- Text shadow for depth -->
+    <text font-family="'Brush Script MT', 'Lucida Handwriting', cursive"
+          font-size="85"
+          fill="#8B6F47"
+          font-weight="normal"
+          font-style="italic"
+          opacity="0.3">
+      <textPath href="#textPath" startOffset="0%" dy="3">
+        arb
+      </textPath>
+    </text>
+  </g>
+
+  <!-- Alternative: If fonts don't render, use path-based cursive text -->
+  <g id="arbTextPath" opacity="0" pointer-events="none">
+    <!-- Fallback cursive "arb" as paths -->
+    <path d="M 520 280 Q 525 260 535 265 Q 545 270 545 285 Q 545 295 540 300 Q 535 305 530 300"
+          stroke="url(#wormGradient)"
+          stroke-width="8"
+          stroke-linecap="round"
+          fill="none"/>
+
+    <path d="M 545 280 Q 555 275 565 280 Q 570 285 570 292 L 570 295 Q 565 300 560 295"
+          stroke="url(#wormGradient)"
+          stroke-width="8"
+          stroke-linecap="round"
+          fill="none"/>
+
+    <path d="M 575 280 Q 585 275 590 280 Q 595 285 595 292 Q 595 298 592 302 Q 590 305 587 303 M 592 292 Q 600 290 605 295"
+          stroke="url(#wormGradient)"
+          stroke-width="8"
+          stroke-linecap="round"
+          fill="none"/>
+  </g>
+</svg>
