@@ -1,13 +1,13 @@
 {
   "expo": {
-    "name": "CARB",
-    "slug": "carb-apple-v3",
+    "name": "CarbClean - Mobile CARB Testing",
+    "slug": "carbclean-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
     "newArchEnabled": true,
-    "description": "Green carbon tracking for truckers - sleek, simple, and smart.",
+    "description": "The #1 mobile CARB compliance testing app for Northern California truckers. Book tests with OCR, track compliance, 24/7 AI support.",
     "primaryColor": "#9BC53D",
     "splash": {
       "image": "./assets/splash-icon.png",
