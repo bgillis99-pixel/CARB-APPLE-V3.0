@@ -1,45 +1,69 @@
-import { Text, View, StyleSheet, Image } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet } from 'react-native';
+import SplashScreen from '../components/SplashScreen';
+import Dashboard from '../components/Dashboard';
+import OCRBooking from '../components/OCRBooking';
+import ComplianceTracker from '../components/ComplianceTracker';
+import AIChat from '../components/AIChat';
+import FindTester from '../components/FindTester';
+
+type Screen =
+  | 'splash'
+  | 'dashboard'
+  | 'ocr-booking'
+  | 'compliance'
+  | 'schedule'
+  | 'chat'
+  | 'fleet'
+  | 'reports'
+  | 'find-tester';
 
 export default function Index() {
+  const [currentScreen, setCurrentScreen] = useState<Screen>('splash');
+  const [bookings, setBookings] = useState<any[]>([]);
+
+  const handleSplashFinish = () => {
+    setCurrentScreen('dashboard');
+  };
+
+  const handleNavigate = (screen: string) => {
+    // Map dashboard navigation to screen names
+    const screenMap: { [key: string]: Screen } = {
+      'ocr-booking': 'ocr-booking',
+      'compliance': 'compliance',
+      'schedule': 'dashboard', // Not implemented yet
+      'chat': 'chat',
+      'fleet': 'find-tester', // Map to find tester for now
+      'reports': 'dashboard', // Not implemented yet
+    };
+
+    const targetScreen = screenMap[screen] || 'dashboard';
+    setCurrentScreen(targetScreen);
+  };
+
+  const handleBack = () => {
+    setCurrentScreen('dashboard');
+  };
+
+  const handleBookingComplete = (bookingData: any) => {
+    setBookings([...bookings, bookingData]);
+  };
+
   return (
     <View style={styles.container}>
-      <StatusBar style="light" />
+      {currentScreen === 'splash' && <SplashScreen onFinish={handleSplashFinish} />}
 
-      {/* Background gradient */}
-      <View style={styles.backgroundGradient}>
-        <View style={[styles.gradientLayer, { backgroundColor: '#1a1a1a' }]} />
-        <View style={[styles.gradientLayer, styles.gradientOverlay]} />
-      </View>
+      {currentScreen === 'dashboard' && <Dashboard onNavigate={handleNavigate} />}
 
-      {/* Main content */}
-      <View style={styles.content}>
-        {/* Logo */}
-        <View style={styles.logoContainer}>
-          <Image
-            source={require('../assets/icon.png')}
-            style={styles.logo}
-            resizeMode="contain"
-          />
-        </View>
+      {currentScreen === 'ocr-booking' && (
+        <OCRBooking onBack={handleBack} onBookingComplete={handleBookingComplete} />
+      )}
 
-        {/* Brand name with C emphasis */}
-        <View style={styles.brandContainer}>
-          <Text style={styles.brandLetter}>C</Text>
-          <Text style={styles.brandText}>ARB</Text>
-        </View>
+      {currentScreen === 'compliance' && <ComplianceTracker onBack={handleBack} />}
 
-        {/* Tagline */}
-        <Text style={styles.tagline}>Green Tracking. Simple Stats.</Text>
+      {currentScreen === 'chat' && <AIChat onBack={handleBack} />}
 
-        {/* Subtle badge */}
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>TRUCKER APPROVED</Text>
-        </View>
-      </View>
-
-      {/* Bottom accent */}
-      <View style={styles.bottomAccent} />
+      {currentScreen === 'find-tester' && <FindTester onBack={handleBack} />}
     </View>
   );
 }
@@ -47,95 +71,5 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a1a',
-  },
-  backgroundGradient: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
-  gradientLayer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
-  gradientOverlay: {
-    backgroundColor: 'transparent',
-    backgroundImage: 'radial-gradient(circle at 50% 20%, rgba(155, 197, 61, 0.15) 0%, rgba(155, 197, 61, 0.05) 40%, transparent 70%)',
-  },
-  content: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 40,
-  },
-  logoContainer: {
-    marginBottom: 40,
-    shadowColor: '#9BC53D',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
-    elevation: 10,
-  },
-  logo: {
-    width: 180,
-    height: 180,
-  },
-  brandContainer: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    marginBottom: 16,
-  },
-  brandLetter: {
-    fontSize: 64,
-    fontWeight: '900',
-    color: '#9BC53D',
-    letterSpacing: -2,
-    textShadowColor: 'rgba(155, 197, 61, 0.4)',
-    textShadowOffset: { width: 0, height: 4 },
-    textShadowRadius: 12,
-  },
-  brandText: {
-    fontSize: 64,
-    fontWeight: '300',
-    color: '#ffffff',
-    letterSpacing: 2,
-  },
-  tagline: {
-    fontSize: 16,
-    color: '#b0b0b0',
-    marginBottom: 40,
-    letterSpacing: 1,
-    fontWeight: '300',
-  },
-  badge: {
-    backgroundColor: 'rgba(155, 197, 61, 0.1)',
-    paddingHorizontal: 20,
-    paddingVertical: 8,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(155, 197, 61, 0.3)',
-  },
-  badgeText: {
-    color: '#9BC53D',
-    fontSize: 11,
-    fontWeight: '600',
-    letterSpacing: 2,
-  },
-  bottomAccent: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 4,
-    backgroundColor: '#9BC53D',
-    shadowColor: '#9BC53D',
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.5,
-    shadowRadius: 8,
   },
 });
