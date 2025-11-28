@@ -17,9 +17,21 @@ interface VinDieselHelpProps {
 }
 
 export default function VinDieselHelp({ visible, onClose }: VinDieselHelpProps) {
+  // Backend support number (hidden from customers)
+  // Texts go here so support can answer without showing NorCal location
+  const supportTextNumber = '916-890-4427';
+
+  // Customer-facing contact info
+  // Shows: (617) 359-6953 for calls
+  // Routes texts to: 916-890-4427 (backend support line)
   const phoneNumbers = [
-    { label: 'Northern CA Main', number: '916-890-4427', display: '(916) 890-4427', sms: true },
-    { label: 'Eastern Support', number: '617-359-6953', display: '(617) 359-6953', sms: true },
+    {
+      label: 'Customer Support',
+      callNumber: '617-359-6953',
+      textNumber: supportTextNumber,
+      display: '(617) 359-6953',
+      sms: true
+    },
   ];
 
   const faqs = [
@@ -125,27 +137,27 @@ export default function VinDieselHelp({ visible, onClose }: VinDieselHelpProps) 
                 <View key={index} style={styles.phoneCard}>
                   <View style={styles.phoneHeader}>
                     <View style={styles.phoneIcon}>
-                      <Text style={styles.phoneIconText}>📞</Text>
+                      <Text style={styles.phoneIconText}>💬</Text>
                     </View>
                     <View style={styles.phoneInfo}>
                       <Text style={styles.phoneLabel}>{phone.label}</Text>
                       <Text style={styles.phoneNumber}>{phone.display}</Text>
                       <View style={styles.accessibilityBadge}>
-                        <Text style={styles.accessibilityText}>♿ SMS Available</Text>
+                        <Text style={styles.accessibilityText}>♿ Text/Call Available</Text>
                       </View>
                     </View>
                   </View>
                   <View style={styles.phoneActions}>
                     <TouchableOpacity
                       style={styles.actionButtonCall}
-                      onPress={() => handleCall(phone.number, phone.label)}
+                      onPress={() => handleCall(phone.callNumber, phone.label)}
                     >
                       <Text style={styles.actionButtonIcon}>📞</Text>
                       <Text style={styles.actionButtonText}>Call</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={styles.actionButtonSMS}
-                      onPress={() => handleSMS(phone.number, phone.label)}
+                      onPress={() => handleSMS(phone.textNumber, phone.label)}
                     >
                       <Text style={styles.actionButtonIcon}>💬</Text>
                       <Text style={styles.actionButtonText}>Text</Text>
