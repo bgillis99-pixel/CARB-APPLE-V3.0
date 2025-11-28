@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import Colors from '../constants/Colors';
+import analytics from '../utils/analytics';
 
 interface FindTesterProps {
   onBack: () => void;
@@ -88,6 +89,9 @@ export default function FindTester({ onBack }: FindTesterProps) {
     const detectedCounty = getCountyFromZip(zipCode);
     setCounty(detectedCounty);
 
+    // Track the search
+    analytics.testerSearchByZip(zipCode, detectedCounty);
+
     // Generate random testers
     const generatedTesters: Tester[] = [
       {
@@ -145,6 +149,9 @@ export default function FindTester({ onBack }: FindTesterProps) {
         {
           text: 'Call',
           onPress: () => {
+            // Track the phone call click (KEY CONVERSION METRIC!)
+            analytics.phoneCallClicked(testerName, phone);
+
             const phoneNumber = phone.replace(/[^0-9]/g, '');
             Linking.openURL(`tel:${phoneNumber}`);
           },
@@ -164,8 +171,14 @@ export default function FindTester({ onBack }: FindTesterProps) {
   };
 
   const handleCountyLink = (countyName: string) => {
-    const url = getCountyURL(countyName);
-    Linking.openURL(url).catch(() => {
+    const baseUrl = getCountyURL(countyName);
+    // Add UTM tracking so website analytics shows traffic from app
+    const urlWithTracking = analytics.addUTMParams(baseUrl, 'county_link');
+
+    // Track the click in app analytics
+    analytics.countyLinkClicked(countyName, urlWithTracking);
+
+    Linking.openURL(urlWithTracking).catch(() => {
       Alert.alert('Error', 'Could not open county page');
     });
   };

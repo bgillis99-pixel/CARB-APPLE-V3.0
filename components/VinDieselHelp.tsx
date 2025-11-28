@@ -10,6 +10,7 @@ import {
   Alert,
 } from 'react-native';
 import Colors, { FontSizes, Spacing } from '../constants/Colors';
+import analytics from '../utils/analytics';
 
 interface VinDieselHelpProps {
   visible: boolean;
@@ -68,11 +69,17 @@ export default function VinDieselHelp({ visible, onClose }: VinDieselHelpProps) 
   ];
 
   const handleCall = (number: string, label: string) => {
+    // Track support calls (KEY CONVERSION METRIC!)
+    analytics.supportCallClicked(number);
+
     const phoneNumber = number.replace(/[^0-9]/g, '');
     Linking.openURL(`tel:${phoneNumber}`);
   };
 
   const handleSMS = (number: string, label: string) => {
+    // Track support texts (accessibility feature usage!)
+    analytics.supportTextClicked(number);
+
     const phoneNumber = number.replace(/[^0-9]/g, '');
     const message = 'Hi! I need help with CARB testing. ';
     Linking.openURL(`sms:${phoneNumber}?body=${encodeURIComponent(message)}`);
@@ -96,8 +103,20 @@ export default function VinDieselHelp({ visible, onClose }: VinDieselHelpProps) 
     );
   };
 
-  const handleBlogLink = (url: string) => {
-    Linking.openURL(url).catch(() => {
+  const handleBlogLink = (
+    url: string,
+    question?: string,
+    campaign: 'faq_link' | 'help_link' | 'website_link' = 'faq_link'
+  ) => {
+    // Add UTM tracking so website analytics shows traffic from app
+    const urlWithTracking = analytics.addUTMParams(url, campaign);
+
+    // Track the FAQ click
+    if (question) {
+      analytics.faqQuestionClicked(question, urlWithTracking);
+    }
+
+    Linking.openURL(urlWithTracking).catch(() => {
       Alert.alert('Error', 'Could not open link');
     });
   };
@@ -178,7 +197,7 @@ export default function VinDieselHelp({ visible, onClose }: VinDieselHelpProps) 
                 <TouchableOpacity
                   key={index}
                   style={styles.faqCard}
-                  onPress={() => handleBlogLink(faq.blogLink)}
+                  onPress={() => handleBlogLink(faq.blogLink, faq.question)}
                   activeOpacity={0.7}
                 >
                   <View style={styles.faqHeader}>
@@ -196,7 +215,13 @@ export default function VinDieselHelp({ visible, onClose }: VinDieselHelpProps) 
             {/* Website Link */}
             <TouchableOpacity
               style={styles.websiteCard}
-              onPress={() => handleBlogLink('https://norcalcarbmobile.com')}
+              onPress={() =>
+                handleBlogLink(
+                  'https://norcalcarbmobile.com',
+                  undefined,
+                  'website_link'
+                )
+              }
             >
               <Text style={styles.websiteIcon}>🌐</Text>
               <View style={styles.websiteInfo}>
