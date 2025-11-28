@@ -32,17 +32,54 @@ export default function VINScanner({ onBack, onVINScanned }: VINScannerProps) {
   const [showManualEntry, setShowManualEntry] = useState(false);
   const scanProgress = useRef(new Animated.Value(0)).current;
 
-  // VIN validation
-  const validateVIN = (vinString: string): boolean => {
-    // VIN must be exactly 17 characters
-    if (vinString.length !== 17) return false;
+  // Comprehensive VIN validation with real rules
+  const validateVIN = (vinString: string): { valid: boolean; errors: string[] } => {
+    const errors: string[] = [];
 
-    // VIN cannot contain I, O, or Q
+    // Rule 1: Must be exactly 17 characters
+    if (vinString.length !== 17) {
+      errors.push(`Length must be 17 (currently ${vinString.length})`);
+    }
+
+    // Rule 2: Cannot contain I, O, or Q (looks like 1 and 0)
+    const invalidChars = vinString.match(/[IOQ]/gi);
+    if (invalidChars) {
+      errors.push(`Contains invalid letters: ${invalidChars.join(', ')} (use 0 not O)`);
+    }
+
+    // Rule 3: Must be alphanumeric only
+    if (!/^[A-HJ-NPR-Z0-9]*$/i.test(vinString)) {
+      errors.push('Only letters A-Z (except I,O,Q) and numbers 0-9 allowed');
+    }
+
+    // Rule 4: Position 9 must be a valid check digit (0-9 or X)
+    if (vinString.length >= 9) {
+      const checkDigit = vinString.charAt(8);
+      if (!/^[0-9X]$/i.test(checkDigit)) {
+        errors.push('Position 9 (check digit) must be 0-9 or X');
+      }
+    }
+
+    // Rule 5: Position 10 must be a valid year code
+    if (vinString.length >= 10) {
+      const yearCode = vinString.charAt(9);
+      const validYearCodes = 'ABCDEFGHJKLMNPRSTVWXY123456789';
+      if (!validYearCodes.includes(yearCode.toUpperCase())) {
+        errors.push('Position 10 (year code) is invalid');
+      }
+    }
+
+    return {
+      valid: errors.length === 0 && vinString.length === 17,
+      errors,
+    };
+  };
+
+  // Quick validation for real-time feedback (simpler version)
+  const isValidVINFormat = (vinString: string): boolean => {
+    if (vinString.length > 17) return false;
     if (/[IOQ]/i.test(vinString)) return false;
-
-    // Basic alphanumeric check
-    if (!/^[A-HJ-NPR-Z0-9]{17}$/i.test(vinString)) return false;
-
+    if (!/^[A-HJ-NPR-Z0-9]*$/i.test(vinString)) return false;
     return true;
   };
 
@@ -126,14 +163,39 @@ export default function VINScanner({ onBack, onVINScanned }: VINScannerProps) {
     }, 2000);
   };
 
-  // Manual VIN entry
-  const handleManualEntry = () => {
-    const cleanVIN = vin.trim().toUpperCase();
+  // Handle text input with real-time filtering
+  const handleVINInput = (text: string) => {
+    // Convert to uppercase
+    let cleanText = text.toUpperCase();
 
-    if (!validateVIN(cleanVIN)) {
+    // Replace O with 0, I with 1 automatically (helpful auto-correction)
+    cleanText = cleanText.replace(/O/g, '0').replace(/I/g, '1');
+
+    // Remove Q and any other invalid characters
+    cleanText = cleanText.replace(/[^A-HJ-NPR-Z0-9]/g, '');
+
+    // Limit to 17 characters
+    cleanText = cleanText.substring(0, 17);
+
+    setVin(cleanText);
+  };
+
+  // Manual VIN entry with detailed validation
+  const handleManualEntry = () => {
+    const cleanVIN = vin.trim();
+
+    const validation = validateVIN(cleanVIN);
+
+    if (!validation.valid) {
       Alert.alert(
-        'Invalid VIN',
-        'VIN must be exactly 17 characters and cannot contain I, O, or Q.\n\nPlease check and try again.'
+        '❌ Invalid VIN',
+        `VIN validation failed:\n\n${validation.errors.map((e, i) => `${i + 1}. ${e}`).join('\n')}\n\n` +
+        `VIN Rules:\n` +
+        `• Exactly 17 characters\n` +
+        `• No letters I, O, or Q (use 1 and 0)\n` +
+        `• Position 9 = check digit (0-9 or X)\n` +
+        `• Position 10 = year code\n\n` +
+        `Tip: Try "1HGBH41J8MN109186" as an example`
       );
       return;
     }
@@ -261,14 +323,25 @@ export default function VINScanner({ onBack, onVINScanned }: VINScannerProps) {
         <View style={styles.manualSection}>
           <Text style={styles.manualTitle}>Enter VIN Manually</Text>
           <Text style={styles.manualSubtitle}>
-            Type or paste the 17-character VIN
+            Type or paste the 17-character VIN (O→0, I→1 auto-corrected)
           </Text>
+
+          {/* VIN Structure Guide */}
+          <View style={styles.vinStructure}>
+            <Text style={styles.vinStructureTitle}>📋 VIN Structure:</Text>
+            <Text style={styles.vinStructureText}>
+              Positions 1-3: Manufacturer{'\n'}
+              Position 9: Check digit (0-9, X){'\n'}
+              Position 10: Year code{'\n'}
+              ❌ No letters I, O, Q allowed
+            </Text>
+          </View>
 
           <TextInput
             style={styles.vinInput}
             value={vin}
-            onChangeText={(text) => setVin(text.toUpperCase())}
-            placeholder="1HGBH41JXMN109186"
+            onChangeText={handleVINInput}
+            placeholder="1HGBH41J8MN109186"
             placeholderTextColor={Colors.text.muted}
             maxLength={17}
             autoCapitalize="characters"
@@ -283,12 +356,12 @@ export default function VINScanner({ onBack, onVINScanned }: VINScannerProps) {
               <Text
                 style={[
                   styles.vinStatus,
-                  validateVIN(vin)
+                  validateVIN(vin).valid
                     ? styles.vinStatusValid
                     : styles.vinStatusInvalid,
                 ]}
               >
-                {validateVIN(vin) ? '✓ Valid format' : '⚠ Invalid format'}
+                {validateVIN(vin).valid ? '✓ Valid VIN' : '⚠ ' + (validateVIN(vin).errors[0] || 'Invalid')}
               </Text>
             )}
           </View>
@@ -296,10 +369,10 @@ export default function VINScanner({ onBack, onVINScanned }: VINScannerProps) {
           <TouchableOpacity
             style={[
               styles.manualButton,
-              !validateVIN(vin) && styles.manualButtonDisabled,
+              !validateVIN(vin).valid && styles.manualButtonDisabled,
             ]}
             onPress={handleManualEntry}
-            disabled={!validateVIN(vin)}
+            disabled={!validateVIN(vin).valid}
           >
             <Text style={styles.manualButtonText}>Validate VIN</Text>
             <Text style={styles.manualButtonIcon}>→</Text>
@@ -512,7 +585,26 @@ const styles = StyleSheet.create({
   manualSubtitle: {
     fontSize: 13,
     color: Colors.text.secondary,
+    marginBottom: 12,
+  },
+  vinStructure: {
+    backgroundColor: Colors.accent.info + '10',
+    borderRadius: 8,
+    padding: 12,
     marginBottom: 16,
+    borderWidth: 1,
+    borderColor: Colors.accent.info + '30',
+  },
+  vinStructureTitle: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: Colors.accent.info,
+    marginBottom: 6,
+  },
+  vinStructureText: {
+    fontSize: 12,
+    color: Colors.text.secondary,
+    lineHeight: 18,
   },
   vinInput: {
     backgroundColor: Colors.background.card,
