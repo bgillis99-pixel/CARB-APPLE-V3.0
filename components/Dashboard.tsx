@@ -2,6 +2,9 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import Colors from '../constants/Colors';
+import { TOUCH_TARGET_SIZE } from '../constants/AccessibilityStyles';
+import { HapticFeedback } from '../utils/haptics';
+import { createButtonAccessibility, createHeaderAccessibility } from '../utils/accessibility';
 
 interface DashboardProps {
   onNavigate: (screen: string) => void;
@@ -16,6 +19,8 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
       icon: '📸',
       color: Colors.primary.green,
       action: () => onNavigate('ocr-booking'),
+      accessibilityLabel: 'Book CARB Test',
+      accessibilityHint: 'Opens camera to scan vehicle documents and book a test in under 60 seconds',
     },
     {
       id: 'compliance',
@@ -24,6 +29,8 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
       icon: '✅',
       color: Colors.compliance.passed,
       action: () => onNavigate('compliance'),
+      accessibilityLabel: 'Compliance Tracker',
+      accessibilityHint: 'View all vehicles, test deadlines, and compliance status',
     },
     {
       id: 'schedule',
@@ -32,6 +39,8 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
       icon: '📅',
       color: Colors.accent.info,
       action: () => onNavigate('schedule'),
+      accessibilityLabel: 'My Schedule',
+      accessibilityHint: 'View upcoming test appointments and set reminders',
     },
     {
       id: 'chat',
@@ -40,6 +49,8 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
       icon: '💬',
       color: Colors.primary.appleCore,
       action: () => onNavigate('chat'),
+      accessibilityLabel: '24/7 AI Support',
+      accessibilityHint: 'Chat with AI assistant for instant help, booking, and questions',
     },
     {
       id: 'vin-scanner',
@@ -48,6 +59,8 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
       icon: '🔍',
       color: Colors.accent.info,
       action: () => onNavigate('vin-scanner'),
+      accessibilityLabel: 'VIN Scanner',
+      accessibilityHint: 'Scan VIN using camera or enter manually',
     },
     {
       id: 'find-tester',
@@ -56,6 +69,8 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
       icon: '📍',
       color: Colors.accent.warning,
       action: () => onNavigate('find-tester'),
+      accessibilityLabel: 'Find a Tester',
+      accessibilityHint: 'Search for certified CARB testers by ZIP code or county',
     },
     {
       id: 'fleet',
@@ -64,6 +79,8 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
       icon: '🚛',
       color: Colors.accent.brown,
       action: () => onNavigate('fleet'),
+      accessibilityLabel: 'Fleet Manager',
+      accessibilityHint: 'Manage and track multiple vehicles for fleet accounts',
     },
     {
       id: 'reports',
@@ -72,6 +89,8 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
       icon: '📊',
       color: Colors.primary.lightGreen,
       action: () => onNavigate('reports'),
+      accessibilityLabel: 'Reports and History',
+      accessibilityHint: 'View past test results and compliance reports',
     },
   ];
 
@@ -80,17 +99,33 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
       <StatusBar style="light" />
 
       {/* Header */}
-      <View style={styles.header}>
+      <View
+        style={styles.header}
+        {...createHeaderAccessibility('CarbClean Mobile CARB Testing')}
+      >
         <Image
           source={require('../assets/icon.png')}
           style={styles.headerLogo}
           resizeMode="contain"
+          accessible={true}
+          accessibilityLabel="CarbClean green apple logo"
+          accessibilityRole="image"
         />
         <View style={styles.headerText}>
-          <Text style={styles.headerTitle}>
+          <Text
+            style={styles.headerTitle}
+            accessible={true}
+            accessibilityRole="header"
+          >
             <Text style={styles.headerC}>C</Text>arbClean
           </Text>
-          <Text style={styles.headerSubtitle}>Mobile CARB Testing</Text>
+          <Text
+            style={styles.headerSubtitle}
+            accessible={true}
+            accessibilityLabel="Mobile CARB Testing"
+          >
+            Mobile CARB Testing
+          </Text>
         </View>
       </View>
 
@@ -98,13 +133,23 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Quick Stats */}
         <View style={styles.statsContainer}>
-          <View style={styles.statCard}>
-            <Text style={styles.statNumber}>24</Text>
-            <Text style={styles.statLabel}>Days to Test</Text>
+          <View
+            style={styles.statCard}
+            accessible={true}
+            accessibilityLabel="24 days until next test"
+            accessibilityRole="text"
+          >
+            <Text style={styles.statNumber} accessible={false}>24</Text>
+            <Text style={styles.statLabel} accessible={false}>Days to Test</Text>
           </View>
-          <View style={[styles.statCard, styles.statCardGreen]}>
-            <Text style={styles.statNumberGreen}>✓</Text>
-            <Text style={styles.statLabelGreen}>Compliant</Text>
+          <View
+            style={[styles.statCard, styles.statCardGreen]}
+            accessible={true}
+            accessibilityLabel="Status: Compliant. You are up to date with CARB testing."
+            accessibilityRole="text"
+          >
+            <Text style={styles.statNumberGreen} accessible={false}>✓</Text>
+            <Text style={styles.statLabelGreen} accessible={false}>Compliant</Text>
           </View>
         </View>
 
@@ -114,23 +159,49 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
             <TouchableOpacity
               key={item.id}
               style={styles.menuCard}
-              onPress={item.action}
+              onPress={async () => {
+                await HapticFeedback.light();
+                item.action();
+              }}
               activeOpacity={0.7}
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel={item.accessibilityLabel}
+              accessibilityHint={item.accessibilityHint}
             >
-              <View style={[styles.iconContainer, { backgroundColor: item.color + '20' }]}>
-                <Text style={styles.icon}>{item.icon}</Text>
+              <View
+                style={[styles.iconContainer, { backgroundColor: item.color + '20' }]}
+                accessible={false}
+              >
+                <Text style={styles.icon} accessible={false}>
+                  {item.icon}
+                </Text>
               </View>
-              <Text style={styles.menuTitle}>{item.title}</Text>
-              <Text style={styles.menuSubtitle}>{item.subtitle}</Text>
-              <View style={[styles.cardAccent, { backgroundColor: item.color }]} />
+              <Text style={styles.menuTitle} accessible={false}>
+                {item.title}
+              </Text>
+              <Text style={styles.menuSubtitle} accessible={false}>
+                {item.subtitle}
+              </Text>
+              <View
+                style={[styles.cardAccent, { backgroundColor: item.color }]}
+                accessible={false}
+              />
             </TouchableOpacity>
           ))}
         </View>
 
         {/* CTA Banner */}
-        <View style={styles.ctaBanner}>
-          <Text style={styles.ctaTitle}>🎯 Northern CA Market Leader</Text>
-          <Text style={styles.ctaSubtitle}>
+        <View
+          style={styles.ctaBanner}
+          accessible={true}
+          accessibilityLabel="Northern California Market Leader. 4.8 star rated with over 100 satisfied truckers."
+          accessibilityRole="text"
+        >
+          <Text style={styles.ctaTitle} accessible={false}>
+            🎯 Northern CA Market Leader
+          </Text>
+          <Text style={styles.ctaSubtitle} accessible={false}>
             4.8★ rated | 100+ satisfied truckers
           </Text>
         </View>
@@ -234,9 +305,11 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background.card,
     borderRadius: 20,
     padding: 20,
+    minHeight: TOUCH_TARGET_SIZE, // Ensure 60pt minimum touch target
     borderWidth: 1,
     borderColor: Colors.text.muted + '20',
     overflow: 'hidden',
+    justifyContent: 'center',
   },
   iconContainer: {
     width: 56,
