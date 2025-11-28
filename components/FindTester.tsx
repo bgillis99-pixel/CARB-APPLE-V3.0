@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import Colors from '../constants/Colors';
+import analytics from '../utils/analytics';
 
 interface FindTesterProps {
   onBack: () => void;
@@ -88,6 +89,9 @@ export default function FindTester({ onBack }: FindTesterProps) {
     const detectedCounty = getCountyFromZip(zipCode);
     setCounty(detectedCounty);
 
+    // Track the search
+    analytics.testerSearchByZip(zipCode, detectedCounty);
+
     // Generate random testers
     const generatedTesters: Tester[] = [
       {
@@ -145,12 +149,38 @@ export default function FindTester({ onBack }: FindTesterProps) {
         {
           text: 'Call',
           onPress: () => {
+            // Track the phone call click (KEY CONVERSION METRIC!)
+            analytics.phoneCallClicked(testerName, phone);
+
             const phoneNumber = phone.replace(/[^0-9]/g, '');
             Linking.openURL(`tel:${phoneNumber}`);
           },
         },
       ]
     );
+  };
+
+  // Convert county name to URL slug for norcalcarbmobile.com
+  const getCountyURL = (countyName: string): string => {
+    // Remove "County" suffix and convert to URL format
+    const slug = countyName
+      .toLowerCase()
+      .replace(' county', '')
+      .replace(/\s+/g, '-');
+    return `https://norcalcarbmobile.com/${slug}`;
+  };
+
+  const handleCountyLink = (countyName: string) => {
+    const baseUrl = getCountyURL(countyName);
+    // Add UTM tracking so website analytics shows traffic from app
+    const urlWithTracking = analytics.addUTMParams(baseUrl, 'county_link');
+
+    // Track the click in app analytics
+    analytics.countyLinkClicked(countyName, urlWithTracking);
+
+    Linking.openURL(urlWithTracking).catch(() => {
+      Alert.alert('Error', 'Could not open county page');
+    });
   };
 
   return (
@@ -195,10 +225,23 @@ export default function FindTester({ onBack }: FindTesterProps) {
           </View>
 
           {county && (
-            <View style={styles.countyBadge}>
-              <Text style={styles.countyIcon}>📍</Text>
-              <Text style={styles.countyText}>{county}</Text>
-            </View>
+            <>
+              <View style={styles.countyBadge}>
+                <Text style={styles.countyIcon}>📍</Text>
+                <Text style={styles.countyText}>{county}</Text>
+              </View>
+              <TouchableOpacity
+                style={styles.countyLinkCard}
+                onPress={() => handleCountyLink(county)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.countyLinkIcon}>📖</Text>
+                <Text style={styles.countyLinkText}>
+                  Learn more about CARB testing in {county}
+                </Text>
+                <Text style={styles.countyLinkArrow}>→</Text>
+              </TouchableOpacity>
+            </>
           )}
         </View>
 
@@ -418,6 +461,32 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
     color: Colors.primary.green,
+  },
+  countyLinkCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.accent.info + '15',
+    borderRadius: 12,
+    padding: 14,
+    marginTop: 8,
+    borderWidth: 1,
+    borderColor: Colors.accent.info + '30',
+  },
+  countyLinkIcon: {
+    fontSize: 18,
+    marginRight: 10,
+  },
+  countyLinkText: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.accent.info,
+    lineHeight: 20,
+  },
+  countyLinkArrow: {
+    fontSize: 20,
+    color: Colors.accent.info,
+    marginLeft: 8,
   },
   infoBanner: {
     flexDirection: 'row',

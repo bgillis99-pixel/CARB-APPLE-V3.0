@@ -53,4 +53,35 @@ export const Colors = {
   },
 };
 
+// Mobile-optimized font sizes (INCREASED for phone readability)
+export const FontSizes = {
+  // Headings
+  h1: 32,      // Large headers
+  h2: 28,      // Section headers
+  h3: 24,      // Card titles
+  h4: 20,      // Sub-headers
+
+  // Body text
+  large: 18,   // Prominent body text
+  body: 16,    // Standard body text
+  small: 14,   // Secondary text
+  caption: 12, // Labels and captions
+
+  // Special
+  button: 18,  // Button text (larger for touch)
+  input: 18,   // Input fields (larger for mobile)
+  badge: 11,   // Small badges
+};
+
+// Spacing system (reduce dead space)
+export const Spacing = {
+  xs: 4,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 20,
+  xxl: 24,
+  xxxl: 32,
+};
+
 export default Colors;
