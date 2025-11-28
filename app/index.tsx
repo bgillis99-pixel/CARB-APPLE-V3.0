@@ -6,6 +6,7 @@ import OCRBooking from '../components/OCRBooking';
 import ComplianceTracker from '../components/ComplianceTracker';
 import AIChat from '../components/AIChat';
 import FindTester from '../components/FindTester';
+import VINScanner from '../components/VINScanner';
 
 type Screen =
   | 'splash'
@@ -16,7 +17,8 @@ type Screen =
   | 'chat'
   | 'fleet'
   | 'reports'
-  | 'find-tester';
+  | 'find-tester'
+  | 'vin-scanner';
 
 export default function Index() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('splash');
@@ -33,8 +35,10 @@ export default function Index() {
       'compliance': 'compliance',
       'schedule': 'dashboard', // Not implemented yet
       'chat': 'chat',
-      'fleet': 'find-tester', // Map to find tester for now
+      'fleet': 'dashboard', // Not implemented yet
       'reports': 'dashboard', // Not implemented yet
+      'vin-scanner': 'vin-scanner',
+      'find-tester': 'find-tester',
     };
 
     const targetScreen = screenMap[screen] || 'dashboard';
@@ -47,6 +51,11 @@ export default function Index() {
 
   const handleBookingComplete = (bookingData: any) => {
     setBookings([...bookings, bookingData]);
+  };
+
+  const handleVINScanned = (vinData: any) => {
+    console.log('VIN Scanned:', vinData);
+    // In production, this would pass VIN data to booking screen
   };
 
   return (
@@ -64,6 +73,10 @@ export default function Index() {
       {currentScreen === 'chat' && <AIChat onBack={handleBack} />}
 
       {currentScreen === 'find-tester' && <FindTester onBack={handleBack} />}
+
+      {currentScreen === 'vin-scanner' && (
+        <VINScanner onBack={handleBack} onVINScanned={handleVINScanned} />
+      )}
     </View>
   );
 }
