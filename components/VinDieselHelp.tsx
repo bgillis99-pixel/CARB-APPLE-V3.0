@@ -171,21 +171,25 @@ export default function VinDieselHelp({ visible, onClose }: VinDieselHelpProps) 
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>❓ Frequently Asked Questions</Text>
               <Text style={styles.sectionSubtitle}>
-                Quick answers from norcalcarbmobile.com
+                Tap any question to read the full answer on norcalcarbmobile.com
               </Text>
 
               {faqs.map((faq, index) => (
-                <View key={index} style={styles.faqCard}>
-                  <Text style={styles.faqQuestion}>{faq.question}</Text>
-                  <Text style={styles.faqAnswer}>{faq.answer}</Text>
-                  <TouchableOpacity
-                    style={styles.blogLink}
-                    onPress={() => handleBlogLink(faq.blogLink)}
-                  >
-                    <Text style={styles.blogLinkText}>📖 Read full article</Text>
-                    <Text style={styles.blogLinkArrow}>→</Text>
-                  </TouchableOpacity>
-                </View>
+                <TouchableOpacity
+                  key={index}
+                  style={styles.faqCard}
+                  onPress={() => handleBlogLink(faq.blogLink)}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.faqHeader}>
+                    <Text style={styles.faqQuestion}>{faq.question}</Text>
+                    <Text style={styles.faqArrow}>→</Text>
+                  </View>
+                  <Text style={styles.faqPreview}>{faq.answer}</Text>
+                  <View style={styles.faqFooter}>
+                    <Text style={styles.faqLinkHint}>📖 Read full answer</Text>
+                  </View>
+                </TouchableOpacity>
               ))}
             </View>
 
@@ -383,36 +387,42 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: Spacing.lg,
     marginBottom: Spacing.md,
+    borderWidth: 2,
+    borderColor: Colors.accent.info + '30',
   },
-  faqQuestion: {
-    fontSize: FontSizes.large,
-    fontWeight: '600',
-    color: Colors.text.primary,
-    marginBottom: Spacing.sm,
-    lineHeight: 24,
-  },
-  faqAnswer: {
-    fontSize: FontSizes.body,
-    color: Colors.text.secondary,
-    lineHeight: 24,
-    marginBottom: Spacing.md,
-  },
-  blogLink: {
+  faqHeader: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: Spacing.sm,
+  },
+  faqQuestion: {
+    flex: 1,
+    fontSize: FontSizes.large,
+    fontWeight: '700',
+    color: Colors.text.primary,
+    lineHeight: 24,
+  },
+  faqArrow: {
+    fontSize: 24,
+    color: Colors.accent.info,
+    marginLeft: Spacing.sm,
+  },
+  faqPreview: {
+    fontSize: FontSizes.body,
+    color: Colors.text.secondary,
+    lineHeight: 22,
+    marginBottom: Spacing.md,
+  },
+  faqFooter: {
     paddingTop: Spacing.sm,
     borderTopWidth: 1,
     borderTopColor: Colors.text.muted + '20',
   },
-  blogLinkText: {
-    flex: 1,
+  faqLinkHint: {
     fontSize: FontSizes.body,
     color: Colors.accent.info,
     fontWeight: '600',
-  },
-  blogLinkArrow: {
-    fontSize: 20,
-    color: Colors.accent.info,
   },
   websiteCard: {
     flexDirection: 'row',
