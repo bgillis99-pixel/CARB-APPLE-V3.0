@@ -79,12 +79,30 @@ export default function AIChat({ onBack }: AIChatProps) {
   const getAIResponse = (userMessage: string): string => {
     const msg = userMessage.toLowerCase();
 
+    // CARB COMPLIANCE & REGULATIONS
+    if (msg.includes('clean truck check') || msg.includes('ctc') || msg.includes('registration')) {
+      return "🚛 Clean Truck Check (CTC):\n\nClean Truck Check is California's online portal for heavy-duty diesel truck compliance tracking and reporting.\n\n✅ What it covers:\n• CARB compliance verification\n• Heavy-duty diesel truck registration\n• Emissions testing records\n• Fleet compliance tracking\n\n📋 To register:\n1. Visit CARB's Clean Truck Check portal\n2. Have your VIN & registration ready\n3. Upload proof of compliance testing\n4. Receive digital compliance certificate\n\nNeed help with testing? I can book you with certified testers!";
+    }
+
+    if (msg.includes('heavy-duty') || msg.includes('heavy duty') || msg.includes('diesel regulation')) {
+      return "🚚 Heavy-Duty Diesel Regulations:\n\nCalifornia requires ALL commercial diesel trucks (14,001+ lbs GVWR) to:\n\n✅ Annual CARB emissions testing\n✅ Clean Truck Check registration\n✅ Compliance certificate on file\n✅ Emissions control device inspection\n\n⚠️ Non-compliance penalties:\n• $1,000+ fines per violation\n• Registration holds\n• Operating restrictions\n\n📅 Stay compliant - book your test now!\nCall: (617) 359-6953";
+    }
+
+    if (msg.includes('certified tester') || msg.includes('find tester') || msg.includes('testing location')) {
+      return "📍 Finding Certified CARB Testers:\n\nUse our Find a Tester tool!\n\n1. Enter your ZIP code\n2. See nearby certified testers\n3. Check ratings & availability\n4. Call to book directly\n\nAll our testers are:\n✅ CARB-certified\n✅ Mobile service available\n✅ Same-day appointments\n✅ Digital certificates\n\nTap '📍 Find nearest tester' or enter your ZIP!";
+    }
+
+    if (msg.includes('compliance') || msg.includes('carb')) {
+      return "✅ CARB Compliance Requirements:\n\nEvery commercial diesel truck in CA needs:\n\n1️⃣ Annual emissions test\n2️⃣ Clean Truck Check registration\n3️⃣ Valid compliance certificate\n4️⃣ Up-to-date records\n\n📱 Our app helps you:\n• Track compliance status\n• Get renewal reminders\n• Book mobile testing\n• Store digital certificates\n\nNeed to check your status? Use our Compliance Tracker!";
+    }
+
+    // BOOKING & SCHEDULING
     if (msg.includes('book') || msg.includes('test') || msg.includes('schedule')) {
       return "🎯 I can help you book a CARB test right away!\n\nOur mobile testing service comes to you. Would you like to:\n\n1. Book for today/tomorrow (express)\n2. Schedule for later this week\n3. Set up recurring tests for your fleet\n\nJust let me know your preference, and I'll check available time slots in your area!";
     }
 
     if (msg.includes('price') || msg.includes('cost') || msg.includes('how much')) {
-      return "💰 CARB Testing Pricing:\n\n• Single truck: $150\n• Express service (24hr): $200\n• Fleet discount (3+ trucks): $120/ea\n• Monthly subscription: $99/truck\n\nAll prices include:\n✓ Mobile service (we come to you)\n✓ Digital certificate\n✓ Compliance tracking\n✓ SMS reminders\n\nWant to book a test?";
+      return "💰 CARB Testing Pricing:\n\n• Single truck: $150\n• Express service (24hr): $200\n• Fleet discount (3+ trucks): $120/ea\n• Monthly subscription: $99/truck\n\nAll prices include:\n✓ Mobile service (we come to you)\n✓ Digital certificate\n✓ Clean Truck Check upload\n✓ Compliance tracking\n✓ SMS reminders\n\nWant to book a test?";
     }
 
     if (msg.includes('location') || msg.includes('where') || msg.includes('find')) {
@@ -96,7 +114,7 @@ export default function AIChat({ onBack }: AIChatProps) {
     }
 
     if (msg.includes('fleet') || msg.includes('multiple') || msg.includes('trucks')) {
-      return "🚛 Fleet Management Services:\n\n✓ Volume discounts (save up to 30%)\n✓ Dedicated account manager\n✓ Automated compliance tracking\n✓ Priority scheduling\n✓ Bulk reporting for audits\n✓ Single invoice for all vehicles\n\nWe work with major fleets including Altec and regional carriers. How many vehicles do you need to manage?";
+      return "🚛 Fleet Management Services:\n\n✓ Volume discounts (save up to 30%)\n✓ Dedicated account manager\n✓ Automated compliance tracking\n✓ Priority scheduling\n✓ Bulk reporting for audits\n✓ Clean Truck Check integration\n✓ Single invoice for all vehicles\n\nWe work with major fleets including Altec and regional carriers. How many vehicles do you need to manage?";
     }
 
     if (/\d{5}/.test(msg)) {
@@ -106,7 +124,7 @@ export default function AIChat({ onBack }: AIChatProps) {
     }
 
     // Default response
-    return "I'm here to help! I can assist with:\n\n• 📅 Booking tests\n• 📍 Finding testers in your area\n• 💰 Pricing & payment options\n• ⏰ Scheduling & availability\n• 🚛 Fleet account setup\n• ✅ Compliance questions\n\nWhat would you like to know?";
+    return "I'm here to help! I can assist with:\n\n• 📅 Booking CARB tests\n• 📍 Finding certified testers\n• 💰 Pricing & payment options\n• ⏰ Scheduling & availability\n• 🚛 Fleet account setup\n• ✅ Compliance & Clean Truck Check questions\n• 📋 Heavy-duty diesel regulations\n\nWhat would you like to know?";
   };
 
   return (
