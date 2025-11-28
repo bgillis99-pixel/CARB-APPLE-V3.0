@@ -16,15 +16,38 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.carbapple.v3"
+      "bundleIdentifier": "com.carbapple.v3",
+      "infoPlist": {
+        "NSCameraUsageDescription": "CarbClean needs camera access to scan VIN numbers from your vehicle for fast booking.",
+        "NSPhotoLibraryUsageDescription": "CarbClean needs photo library access to select VIN images for OCR scanning."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#9BC53D"
       },
-      "package": "com.carbapple.v3"
+      "package": "com.carbapple.v3",
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
     },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow CarbClean to access your camera to scan VIN numbers."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow CarbClean to access your photos to select VIN images."
+        }
+      ]
+    ],
     "web": {
       "favicon": "./assets/favicon.png",
       "name": "CARB",

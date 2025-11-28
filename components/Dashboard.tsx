@@ -42,6 +42,22 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
       action: () => onNavigate('chat'),
     },
     {
+      id: 'vin-scanner',
+      title: 'VIN Scanner Plugin',
+      subtitle: 'Camera OCR + manual entry',
+      icon: '🔍',
+      color: Colors.accent.info,
+      action: () => onNavigate('vin-scanner'),
+    },
+    {
+      id: 'find-tester',
+      title: 'Find Tester Plugin',
+      subtitle: 'ZIP code tester locator',
+      icon: '📍',
+      color: Colors.accent.warning,
+      action: () => onNavigate('find-tester'),
+    },
+    {
       id: 'fleet',
       title: 'Fleet Manager',
       subtitle: 'Track multiple vehicles',
@@ -54,7 +70,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
       title: 'Reports & History',
       subtitle: 'View past test results',
       icon: '📊',
-      color: Colors.accent.warning,
+      color: Colors.primary.lightGreen,
       action: () => onNavigate('reports'),
     },
   ];
