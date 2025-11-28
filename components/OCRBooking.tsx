@@ -7,9 +7,13 @@ import {
   ScrollView,
   TextInput,
   Alert,
+  Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import * as ImagePicker from 'expo-image-picker';
 import Colors from '../constants/Colors';
+import { extractVINFromImage, decodeVIN } from '../utils/ocrService';
 
 interface OCRBookingProps {
   onBack: () => void;
@@ -18,6 +22,7 @@ interface OCRBookingProps {
 
 export default function OCRBooking({ onBack, onBookingComplete }: OCRBookingProps) {
   const [step, setStep] = useState(1);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [vehicleData, setVehicleData] = useState({
     vin: '',
     licensePlate: '',
@@ -31,29 +36,70 @@ export default function OCRBooking({ onBack, onBookingComplete }: OCRBookingProp
     email: '',
   });
 
-  const handleOCRScan = () => {
-    // Simulate OCR scan - in production, this would use camera/OCR library
-    Alert.alert(
-      'OCR Scan Ready',
-      'In production, this will:\n\n• Open camera to scan VIN\n• Scan registration documents\n• Auto-fill vehicle details\n• Extract compliance info',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Simulate Scan',
-          onPress: () => {
-            // Simulate successful OCR scan
-            setVehicleData({
-              vin: '1HGBH41JXMN109186',
-              licensePlate: '8ABC123',
-              year: '2020',
-              make: 'Peterbilt',
-              model: '579',
-            });
-            Alert.alert('Success!', 'Vehicle information captured via OCR');
-          },
-        },
-      ]
-    );
+  const handleOCRScan = async () => {
+    setIsProcessing(true);
+
+    try {
+      // Request permissions
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission Required', 'Photo library permissions are needed for OCR');
+        setIsProcessing(false);
+        return;
+      }
+
+      // Launch image picker
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        quality: 1,
+      });
+
+      if (result.canceled) {
+        setIsProcessing(false);
+        return;
+      }
+
+      // Extract VIN using OCR
+      const imageUri = result.assets[0].uri;
+      const ocrResult = await extractVINFromImage(imageUri);
+
+      if (ocrResult.success && ocrResult.vin) {
+        // Decode VIN using NHTSA API
+        const vehicleInfo = await decodeVIN(ocrResult.vin);
+
+        setVehicleData({
+          vin: ocrResult.vin,
+          licensePlate: vehicleData.licensePlate, // Keep existing if any
+          year: vehicleInfo.year || '',
+          make: vehicleInfo.make || '',
+          model: vehicleInfo.model || '',
+        });
+
+        setIsProcessing(false);
+        Alert.alert(
+          '✅ VIN Extracted!',
+          `VIN: ${ocrResult.vin}\n${vehicleInfo.year ? `Year: ${vehicleInfo.year}\n` : ''}${vehicleInfo.make ? `Make: ${vehicleInfo.make}\n` : ''}${vehicleInfo.model ? `Model: ${vehicleInfo.model}\n` : ''}\nConfidence: ${Math.round(ocrResult.confidence || 0)}%\n\nForm has been auto-filled!`,
+          [{ text: 'Continue', onPress: () => setStep(2) }]
+        );
+      } else {
+        setIsProcessing(false);
+        Alert.alert(
+          '❌ VIN Not Found',
+          ocrResult.error || 'Could not extract VIN. Please:\n• Ensure VIN is clearly visible\n• Use good lighting\n• Take focused photo\n\nOr enter VIN manually below.',
+          [{ text: 'OK' }]
+        );
+      }
+    } catch (error) {
+      setIsProcessing(false);
+      console.error('OCR scan error:', error);
+      Alert.alert(
+        'Scan Error',
+        'Failed to scan document. Please try again or enter details manually.\n\n' +
+        (error instanceof Error ? error.message : 'Unknown error'),
+        [{ text: 'OK' }]
+      );
+    }
   };
 
   const handleBooking = () => {
@@ -100,15 +146,37 @@ export default function OCRBooking({ onBack, onBookingComplete }: OCRBookingProp
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* OCR Scan Button */}
-        <TouchableOpacity style={styles.ocrButton} onPress={handleOCRScan}>
-          <Text style={styles.ocrIcon}>📸</Text>
-          <View style={styles.ocrText}>
-            <Text style={styles.ocrTitle}>Scan Documents</Text>
-            <Text style={styles.ocrSubtitle}>
-              Auto-fill with OCR (VIN, registration, etc.)
-            </Text>
-          </View>
-          <Text style={styles.ocrArrow}>→</Text>
+        <TouchableOpacity
+          style={[styles.ocrButton, isProcessing && styles.ocrButtonDisabled]}
+          onPress={handleOCRScan}
+          disabled={isProcessing}
+        >
+          {isProcessing ? (
+            <>
+              <ActivityIndicator size="small" color={Colors.text.onGreen} style={{ marginRight: 16 }} />
+              <View style={styles.ocrText}>
+                <Text style={styles.ocrTitle}>Processing Image...</Text>
+                <Text style={styles.ocrSubtitle}>
+                  Extracting VIN with OCR
+                </Text>
+              </View>
+            </>
+          ) : (
+            <>
+              <Text style={styles.ocrIcon}>📸</Text>
+              <View style={styles.ocrText}>
+                <Text style={styles.ocrTitle}>
+                  {Platform.OS === 'web' ? 'Upload Document Photo' : 'Scan Documents'}
+                </Text>
+                <Text style={styles.ocrSubtitle}>
+                  {Platform.OS === 'web'
+                    ? 'Auto-fill with OCR (VIN from image)'
+                    : 'Auto-fill with OCR (VIN, registration, etc.)'}
+                </Text>
+              </View>
+              <Text style={styles.ocrArrow}>→</Text>
+            </>
+          )}
         </TouchableOpacity>
 
         {/* Step Indicator */}
@@ -303,6 +371,9 @@ const styles = StyleSheet.create({
     padding: 20,
     marginTop: 20,
     marginBottom: 24,
+  },
+  ocrButtonDisabled: {
+    opacity: 0.6,
   },
   ocrIcon: {
     fontSize: 32,

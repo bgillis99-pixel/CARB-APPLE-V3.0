@@ -46,7 +46,9 @@
         {
           "photosPermission": "Allow CarbClean to access your photos to select VIN images."
         }
-      ]
+      ],
+      "expo-asset",
+      "expo-font"
     ],
     "web": {
       "favicon": "./assets/favicon.png",
