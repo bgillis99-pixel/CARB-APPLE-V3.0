@@ -14,10 +14,10 @@ export const Colors = {
 
   // Background colors
   background: {
-    dark: '#2a2a2a',       // Main dark background
-    darker: '#1a1a1a',     // Deeper black
-    card: '#333333',       // Card backgrounds
-    overlay: 'rgba(42, 42, 42, 0.95)',
+    dark: '#000000',       // Pure black background
+    darker: '#000000',     // Pure black background
+    card: '#1a1a1a',       // Card backgrounds (dark gray for contrast)
+    overlay: 'rgba(0, 0, 0, 0.95)',
   },
 
   // Text colors

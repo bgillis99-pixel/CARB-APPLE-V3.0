@@ -129,9 +129,9 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
 
         {/* CTA Banner */}
         <View style={styles.ctaBanner}>
-          <Text style={styles.ctaTitle}>🎯 Northern CA Market Leader</Text>
+          <Text style={styles.ctaTitle}>🍏 Apple CARB is #1 in Northern CA</Text>
           <Text style={styles.ctaSubtitle}>
-            4.8★ rated | 100+ satisfied truckers
+            4.8★ rated | 100+ satisfied truckers | Market Leader
           </Text>
         </View>
       </ScrollView>
