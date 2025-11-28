@@ -85,6 +85,13 @@ export default function VinDieselHelp({ visible, onClose }: VinDieselHelpProps) 
     Linking.openURL(`sms:${phoneNumber}?body=${encodeURIComponent(message)}`);
   };
 
+  const handleEmail = () => {
+    const email = 'support@norcalcarbmobile.com';
+    const subject = 'CARB Testing Support Request';
+    const body = 'Hi! I need help with CARB testing. ';
+    Linking.openURL(`mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+  };
+
   const handleContact = (number: string, label: string) => {
     Alert.alert(
       `Contact ${label}`,
@@ -136,8 +143,8 @@ export default function VinDieselHelp({ visible, onClose }: VinDieselHelpProps) 
               <Text style={styles.iconText}>💪</Text>
             </View>
             <View style={styles.headerText}>
-              <Text style={styles.headerTitle}>ASK VIN DIESEL</Text>
-              <Text style={styles.headerSubtitle}>Real Human. Real Answers.</Text>
+              <Text style={styles.headerTitle}>Ask VINAI DIESEL 🤖</Text>
+              <Text style={styles.headerSubtitle}>Anything Diesel Carbcleantruckcheck Related</Text>
             </View>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
               <Text style={styles.closeIcon}>×</Text>
@@ -151,6 +158,15 @@ export default function VinDieselHelp({ visible, onClose }: VinDieselHelpProps) 
               <Text style={styles.sectionSubtitle}>
                 Our team is ready to help. No bots, just people who know CARB testing.
               </Text>
+
+              {/* Share Button */}
+              <TouchableOpacity
+                style={styles.shareButton}
+                onPress={() => Alert.alert('Share', 'Share this app with fellow truckers!')}
+              >
+                <Text style={styles.shareButtonIcon}>📤</Text>
+                <Text style={styles.shareButtonText}>Share App</Text>
+              </TouchableOpacity>
 
               {phoneNumbers.map((phone, index) => (
                 <View key={index} style={styles.phoneCard}>
@@ -180,6 +196,13 @@ export default function VinDieselHelp({ visible, onClose }: VinDieselHelpProps) 
                     >
                       <Text style={styles.actionButtonIcon}>💬</Text>
                       <Text style={styles.actionButtonText}>Text</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.actionButtonEmail}
+                      onPress={handleEmail}
+                    >
+                      <Text style={styles.actionButtonIcon}>📧</Text>
+                      <Text style={styles.actionButtonText}>Email</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -323,6 +346,24 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.lg,
     lineHeight: 22,
   },
+  shareButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.primary.green,
+    borderRadius: 12,
+    padding: Spacing.md,
+    marginBottom: Spacing.lg,
+    gap: Spacing.xs,
+  },
+  shareButtonIcon: {
+    fontSize: 20,
+  },
+  shareButtonText: {
+    fontSize: FontSizes.button,
+    fontWeight: '700',
+    color: Colors.text.onGreen,
+  },
   phoneCard: {
     backgroundColor: Colors.background.card,
     borderRadius: 16,
@@ -377,7 +418,7 @@ const styles = StyleSheet.create({
   },
   phoneActions: {
     flexDirection: 'row',
-    gap: Spacing.sm,
+    gap: Spacing.xs,
   },
   actionButtonCall: {
     flex: 1,
@@ -395,6 +436,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: Colors.accent.info,
+    borderRadius: 12,
+    padding: Spacing.md,
+    gap: Spacing.xs,
+  },
+  actionButtonEmail: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.primary.green,
     borderRadius: 12,
     padding: Spacing.md,
     gap: Spacing.xs,
