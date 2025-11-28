@@ -9,9 +9,12 @@ import {
   Alert,
   Modal,
   Animated,
+  Platform,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import * as ImagePicker from 'expo-image-picker';
 import Colors from '../constants/Colors';
+import { extractVINFromImage, decodeVIN as decodeVINAPI } from '../utils/ocrService';
 
 interface VINScannerProps {
   onBack: () => void;
@@ -129,38 +132,104 @@ export default function VINScanner({ onBack, onVINScanned }: VINScannerProps) {
     return manufacturers[makeCode] || { make: 'Commercial Truck', model: 'Unknown' };
   };
 
-  // Simulate camera OCR scanning
-  const handleCameraScan = () => {
+  // Real camera OCR scanning
+  const handleCameraScan = async () => {
     setIsScanning(true);
 
-    // Animate scanning progress
-    Animated.timing(scanProgress, {
-      toValue: 100,
-      duration: 2000,
-      useNativeDriver: false,
-    }).start();
+    try {
+      // Request permissions
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission Required', 'Camera roll permissions are needed to scan VIN');
+        setIsScanning(false);
+        return;
+      }
 
-    // Simulate OCR processing
-    setTimeout(() => {
-      // Simulate successful VIN extraction
-      const simulatedVIN = '1HGBH41JXMN109186';
-      const vinData = decodeVIN(simulatedVIN);
+      // Animate scanning progress
+      Animated.timing(scanProgress, {
+        toValue: 30,
+        duration: 500,
+        useNativeDriver: false,
+      }).start();
+
+      // Launch image picker (works on web and native)
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        quality: 1,
+      });
+
+      if (result.canceled) {
+        setIsScanning(false);
+        scanProgress.setValue(0);
+        return;
+      }
+
+      // Update progress
+      Animated.timing(scanProgress, {
+        toValue: 60,
+        duration: 500,
+        useNativeDriver: false,
+      }).start();
+
+      // Extract VIN using OCR
+      const imageUri = result.assets[0].uri;
+      const ocrResult = await extractVINFromImage(imageUri);
+
+      // Update progress
+      Animated.timing(scanProgress, {
+        toValue: 100,
+        duration: 500,
+        useNativeDriver: false,
+      }).start();
 
       setIsScanning(false);
-      scanProgress.setValue(0);
 
+      if (ocrResult.success && ocrResult.vin) {
+        // Decode VIN using NHTSA API
+        const vehicleInfo = await decodeVINAPI(ocrResult.vin);
+
+        const vinData: VINData = {
+          vin: ocrResult.vin,
+          year: vehicleInfo.year || getYearFromCode(ocrResult.vin.charAt(9)),
+          make: vehicleInfo.make || 'Commercial Truck',
+          model: vehicleInfo.model || 'Unknown',
+          scannedBy: 'camera',
+        };
+
+        Alert.alert(
+          '✅ VIN Extracted Successfully!',
+          `VIN: ${vinData.vin}\nYear: ${vinData.year}\nMake: ${vinData.make}\nModel: ${vinData.model}\n\nConfidence: ${Math.round(ocrResult.confidence || 0)}%`,
+          [
+            { text: 'Rescan', style: 'cancel', onPress: () => scanProgress.setValue(0) },
+            {
+              text: 'Use This VIN',
+              onPress: () => {
+                scanProgress.setValue(0);
+                onVINScanned(vinData);
+              },
+            },
+          ]
+        );
+      } else {
+        scanProgress.setValue(0);
+        Alert.alert(
+          '❌ VIN Not Found',
+          ocrResult.error || 'Could not extract VIN from image. Please ensure:\n• VIN is clearly visible\n• Good lighting\n• Focused image\n\nTry again or enter VIN manually below.',
+          [{ text: 'OK' }]
+        );
+      }
+    } catch (error) {
+      setIsScanning(false);
+      scanProgress.setValue(0);
+      console.error('VIN scan error:', error);
       Alert.alert(
-        '✅ VIN Scanned Successfully!',
-        `VIN: ${vinData.vin}\nYear: ${vinData.year}\nMake: ${vinData.make}\nModel: ${vinData.model}\n\nIn production, this uses:\n• Expo Camera for photo capture\n• OCR API for text extraction\n• NHTSA API for VIN decoding`,
-        [
-          { text: 'Rescan', style: 'cancel' },
-          {
-            text: 'Use This VIN',
-            onPress: () => onVINScanned(vinData),
-          },
-        ]
+        'Scan Error',
+        'Failed to scan VIN. Please try again or enter manually.\n\n' +
+        (error instanceof Error ? error.message : 'Unknown error'),
+        [{ text: 'OK' }]
       );
-    }, 2000);
+    }
   };
 
   // Handle text input with real-time filtering
@@ -252,11 +321,13 @@ export default function VINScanner({ onBack, onVINScanned }: VINScannerProps) {
             <Text style={styles.scanIcon}>📸</Text>
             <View style={styles.scanText}>
               <Text style={styles.scanTitle}>
-                {isScanning ? 'Scanning VIN...' : 'Scan VIN with Camera'}
+                {isScanning ? 'Scanning VIN...' : Platform.OS === 'web' ? 'Upload VIN Image' : 'Scan VIN with Camera'}
               </Text>
               <Text style={styles.scanSubtitle}>
                 {isScanning
-                  ? 'Processing image with OCR'
+                  ? 'Processing image with OCR...'
+                  : Platform.OS === 'web'
+                  ? 'Select photo of VIN for OCR extraction'
                   : 'Point camera at VIN plate'}
               </Text>
             </View>
